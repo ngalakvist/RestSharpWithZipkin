@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestSharpZipkin", "RestSharpZipkin\RestSharpZipkin.csproj", "{9C11B31E-42E2-4935-A409-EE03B583C822}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TracingRestClient", "TracingRestClient\TracingRestClient.csproj", "{81171D40-1911-4C74-B8DF-2741BEE8F495}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestRestSharpTraceClient", "TestRestSharpTraceClient\TestRestSharpTraceClient.csproj", "{222389E4-B9CC-4BB6-80F7-F316B97A9283}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{9C11B31E-42E2-4935-A409-EE03B583C822}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C11B31E-42E2-4935-A409-EE03B583C822}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C11B31E-42E2-4935-A409-EE03B583C822}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81171D40-1911-4C74-B8DF-2741BEE8F495}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81171D40-1911-4C74-B8DF-2741BEE8F495}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81171D40-1911-4C74-B8DF-2741BEE8F495}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81171D40-1911-4C74-B8DF-2741BEE8F495}.Release|Any CPU.Build.0 = Release|Any CPU
+		{222389E4-B9CC-4BB6-80F7-F316B97A9283}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{222389E4-B9CC-4BB6-80F7-F316B97A9283}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{222389E4-B9CC-4BB6-80F7-F316B97A9283}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{222389E4-B9CC-4BB6-80F7-F316B97A9283}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
