@@ -12,6 +12,7 @@ namespace RestSharpZipkin
     private readonly string _serviceName;
     private readonly Func<HttpRequestMessage, string> _getClientTraceRpc;
 
+
     /// <param name="serviceName"></param>
     /// <param name="getClientTraceRpc"></param>
     /// <returns></returns>

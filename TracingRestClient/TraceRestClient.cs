@@ -14,30 +14,48 @@ using System.Threading.Tasks;
 using zipkin4net.Middleware;
 
 namespace RestSharpZipkin
-{
+{ /// <summary>
+/// RestSharp wrapper that user zipkin to generate traces
+/// </summary>
   public class TraceRestClient : IRestClient
   {
-    private readonly IRestClient _innerClient;
-    public TracingRestClientHandler RestClientHandler;
-
-    public TraceRestClient(IRestClient innerClient)
-
+    private IRestClient innerClient;
+    public TracingRestClientHandler restClientHandler;
+    private ZipkinB3TraceHeaderInjector traceHeaderInjector;
+    /// <summary>
+    /// RestSharpZipkinTraceClient .
+    /// Injects  b3 headers to all request.
+    /// </summary>
+    /// <param name="innerClient"></param>
+    /// <param name="restClientAppName"></param>
+    /// <param name="zipkinServerName"></param>
+    public TraceRestClient(IRestClient innerClient, string restClientAppName, string zipkinServerName)
     {
-      RestClientHandler = TracingRestClientHandler.WithoutInnerHandler("RestSharpZipkin");
-      _innerClient = innerClient;
-
+      SetUpRestSharpZipkinTracerClient(innerClient, restClientAppName, zipkinServerName);
     }
+
+    private void SetUpRestSharpZipkinTracerClient(IRestClient innerClient, string restClientAppName,
+      string zipkinServerName)
+    {
+      restClientHandler = TracingRestClientHandler.WithoutInnerHandler(restClientAppName);
+      this.innerClient = innerClient ?? throw new ArgumentNullException("innerClient");
+      restClientAppName = restClientAppName ?? throw new ArgumentNullException("restClientAppName");
+      zipkinServerName = zipkinServerName ?? throw new ArgumentNullException("zipkinServerName");
+      traceHeaderInjector = new ZipkinB3TraceHeaderInjector(restClientAppName, zipkinServerName);
+    }
+
+    public TracingRestClientHandler RestClientHandler => restClientHandler;
 
     public IAuthenticator Authenticator
     {
       get
       {
-        return _innerClient.Authenticator;
+        return innerClient.Authenticator;
       }
 
       set
       {
-        _innerClient.Authenticator = value;
+        innerClient.Authenticator = value;
       }
     }
 
@@ -45,12 +63,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.BaseUrl;
+        return innerClient.BaseUrl;
       }
 
       set
       {
-        _innerClient.BaseUrl = value;
+        innerClient.BaseUrl = value;
       }
     }
 
@@ -58,12 +76,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.CachePolicy;
+        return innerClient.CachePolicy;
       }
 
       set
       {
-        _innerClient.CachePolicy = value;
+        innerClient.CachePolicy = value;
       }
     }
 
@@ -71,12 +89,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.ClientCertificates;
+        return innerClient.ClientCertificates;
       }
 
       set
       {
-        _innerClient.ClientCertificates = value;
+        innerClient.ClientCertificates = value;
       }
     }
 
@@ -84,12 +102,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.CookieContainer;
+        return innerClient.CookieContainer;
       }
 
       set
       {
-        _innerClient.CookieContainer = value;
+        innerClient.CookieContainer = value;
       }
     }
 
@@ -97,7 +115,7 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.DefaultParameters;
+        return innerClient.DefaultParameters;
       }
     }
 
@@ -105,12 +123,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.Encoding;
+        return innerClient.Encoding;
       }
 
       set
       {
-        _innerClient.Encoding = value;
+        innerClient.Encoding = value;
       }
     }
 
@@ -120,12 +138,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.FollowRedirects;
+        return innerClient.FollowRedirects;
       }
 
       set
       {
-        _innerClient.FollowRedirects = value;
+        innerClient.FollowRedirects = value;
       }
     }
 
@@ -133,12 +151,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.MaxRedirects;
+        return innerClient.MaxRedirects;
       }
 
       set
       {
-        _innerClient.MaxRedirects = value;
+        innerClient.MaxRedirects = value;
       }
     }
 
@@ -146,12 +164,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.PreAuthenticate;
+        return innerClient.PreAuthenticate;
       }
 
       set
       {
-        _innerClient.PreAuthenticate = value;
+        innerClient.PreAuthenticate = value;
       }
     }
 
@@ -159,12 +177,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.Proxy;
+        return innerClient.Proxy;
       }
 
       set
       {
-        _innerClient.Proxy = value;
+        innerClient.Proxy = value;
       }
     }
 
@@ -172,12 +190,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.ReadWriteTimeout;
+        return innerClient.ReadWriteTimeout;
       }
 
       set
       {
-        _innerClient.ReadWriteTimeout = value;
+        innerClient.ReadWriteTimeout = value;
       }
     }
 
@@ -185,12 +203,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.Timeout;
+        return innerClient.Timeout;
       }
 
       set
       {
-        _innerClient.Timeout = value;
+        innerClient.Timeout = value;
       }
     }
 
@@ -198,12 +216,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.UserAgent;
+        return innerClient.UserAgent;
       }
 
       set
       {
-        _innerClient.UserAgent = value;
+        innerClient.UserAgent = value;
       }
     }
 
@@ -211,12 +229,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.UseSynchronizationContext;
+        return innerClient.UseSynchronizationContext;
       }
 
       set
       {
-        _innerClient.UseSynchronizationContext = value;
+        innerClient.UseSynchronizationContext = value;
       }
     }
 
@@ -224,12 +242,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.AutomaticDecompression;
+        return innerClient.AutomaticDecompression;
       }
 
       set
       {
-        _innerClient.AutomaticDecompression = value;
+        innerClient.AutomaticDecompression = value;
       }
     }
 
@@ -237,12 +255,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.ConnectionGroupName;
+        return innerClient.ConnectionGroupName;
       }
 
       set
       {
-        _innerClient.ConnectionGroupName = value;
+        innerClient.ConnectionGroupName = value;
       }
     }
 
@@ -250,12 +268,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.UnsafeAuthenticatedConnectionSharing;
+        return innerClient.UnsafeAuthenticatedConnectionSharing;
       }
 
       set
       {
-        _innerClient.UnsafeAuthenticatedConnectionSharing = value;
+        innerClient.UnsafeAuthenticatedConnectionSharing = value;
       }
     }
 
@@ -263,12 +281,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.BaseHost;
+        return innerClient.BaseHost;
       }
 
       set
       {
-        _innerClient.BaseHost = value;
+        innerClient.BaseHost = value;
       }
     }
 
@@ -276,12 +294,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.AllowMultipleDefaultParametersWithSameName;
+        return innerClient.AllowMultipleDefaultParametersWithSameName;
       }
 
       set
       {
-        _innerClient.AllowMultipleDefaultParametersWithSameName = value;
+        innerClient.AllowMultipleDefaultParametersWithSameName = value;
       }
     }
 
@@ -289,12 +307,12 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.Pipelined;
+        return innerClient.Pipelined;
       }
 
       set
       {
-        _innerClient.Pipelined = value;
+        innerClient.Pipelined = value;
       }
     }
 
@@ -302,55 +320,55 @@ namespace RestSharpZipkin
     {
       get
       {
-        return _innerClient.RemoteCertificateValidationCallback;
+        return innerClient.RemoteCertificateValidationCallback;
       }
 
       set
       {
-        _innerClient.RemoteCertificateValidationCallback = value;
+        innerClient.RemoteCertificateValidationCallback = value;
       }
     }
 
     public void AddHandler(string contentType, IDeserializer deserializer)
     {
-      _innerClient.AddHandler(contentType, deserializer);
+      innerClient.AddHandler(contentType, deserializer);
     }
 
     public void AddHandler(string contentType, Func<IDeserializer> deserializerFactory)
     {
-      _innerClient.AddHandler(contentType, deserializerFactory);
+      innerClient.AddHandler(contentType, deserializerFactory);
     }
 
     public Uri BuildUri(IRestRequest request)
     {
-      return _innerClient.BuildUri(request);
+      return innerClient.BuildUri(request);
     }
 
     public string BuildUriWithoutQueryParameters(IRestRequest request)
     {
-      return _innerClient.BuildUriWithoutQueryParameters(request);
+      return innerClient.BuildUriWithoutQueryParameters(request);
     }
 
     public void ClearHandlers()
     {
-      _innerClient.ClearHandlers();
+      innerClient.ClearHandlers();
     }
 
     public byte[] DownloadData(IRestRequest request)
     {
-      return _innerClient.DownloadData(request);
+      return innerClient.DownloadData(request);
     }
 
     public IRestClient UseQueryEncoder(Func<string, Encoding, string> queryEncoder)
     {
-      return _innerClient.UseQueryEncoder(queryEncoder);
+      return innerClient.UseQueryEncoder(queryEncoder);
     }
 
     public virtual IRestResponse Execute(IRestRequest request)
     {
-      var traceHeaderInjector = new ZipkinB3TraceHeaderInjector("TestRestSharpTraceClient", "http://localhost:9411");
+
       traceHeaderInjector.InjectB3TraceToRequestHeaders(request, this);
-      return _innerClient.Execute(request);
+      return innerClient.Execute(request);
 
     }
     private static string Getter(HttpHeader carrier, string key)
@@ -360,136 +378,136 @@ namespace RestSharpZipkin
 
     public IRestResponse<T> Execute<T>(IRestRequest request) where T : new()
     {
-      return _innerClient.Execute<T>(request);
+      return innerClient.Execute<T>(request);
     }
 
     public IRestResponse ExecuteAsGet(IRestRequest request, string httpMethod)
     {
-      return _innerClient.ExecuteAsGet(request, httpMethod);
+      return innerClient.ExecuteAsGet(request, httpMethod);
     }
 
     public IRestResponse<T> ExecuteAsGet<T>(IRestRequest request, string httpMethod) where T : new()
     {
-      return _innerClient.ExecuteAsGet<T>(request, httpMethod);
+      return innerClient.ExecuteAsGet<T>(request, httpMethod);
     }
 
     public IRestResponse ExecuteAsPost(IRestRequest request, string httpMethod)
     {
-      return _innerClient.ExecuteAsPost(request, httpMethod);
+      return innerClient.ExecuteAsPost(request, httpMethod);
     }
 
     public IRestResponse<T> ExecuteAsPost<T>(IRestRequest request, string httpMethod) where T : new()
     {
-      return _innerClient.ExecuteAsPost<T>(request, httpMethod);
+      return innerClient.ExecuteAsPost<T>(request, httpMethod);
     }
 
     public IRestClient UseSerializer(IRestSerializer serializer)
     {
-      return _innerClient.UseSerializer(serializer);
+      return innerClient.UseSerializer(serializer);
     }
 
     public RestRequestAsyncHandle ExecuteAsync(IRestRequest request, Action<IRestResponse, RestRequestAsyncHandle> callback)
     {
-      return _innerClient.ExecuteAsync(request, callback);
+      return innerClient.ExecuteAsync(request, callback);
     }
 
     public RestRequestAsyncHandle ExecuteAsync<T>(IRestRequest request, Action<IRestResponse<T>, RestRequestAsyncHandle> callback)
     {
 
-      return _innerClient.ExecuteAsync<T>(request, callback);
+      return innerClient.ExecuteAsync<T>(request, callback);
     }
 
     public RestRequestAsyncHandle ExecuteAsyncGet(IRestRequest request, Action<IRestResponse, RestRequestAsyncHandle> callback, string httpMethod)
     {
-      return _innerClient.ExecuteAsyncGet(request, callback, httpMethod);
+      return innerClient.ExecuteAsyncGet(request, callback, httpMethod);
     }
 
     public RestRequestAsyncHandle ExecuteAsyncGet<T>(IRestRequest request, Action<IRestResponse<T>, RestRequestAsyncHandle> callback, string httpMethod)
     {
 
-      return _innerClient.ExecuteAsyncGet<T>(request, callback, httpMethod);
+      return innerClient.ExecuteAsyncGet<T>(request, callback, httpMethod);
     }
 
     public RestRequestAsyncHandle ExecuteAsyncPost(IRestRequest request, Action<IRestResponse, RestRequestAsyncHandle> callback, string httpMethod)
     {
 
-      return _innerClient.ExecuteAsyncPost(request, callback, httpMethod);
+      return innerClient.ExecuteAsyncPost(request, callback, httpMethod);
     }
 
     public RestRequestAsyncHandle ExecuteAsyncPost<T>(IRestRequest request, Action<IRestResponse<T>, RestRequestAsyncHandle> callback, string httpMethod)
     {
-      return _innerClient.ExecuteAsyncPost<T>(request, callback, httpMethod);
+      return innerClient.ExecuteAsyncPost<T>(request, callback, httpMethod);
     }
 
     public Task<IRestResponse> ExecuteGetTaskAsync(IRestRequest request)
     {
-      return _innerClient.ExecuteGetTaskAsync(request);
+      return innerClient.ExecuteGetTaskAsync(request);
     }
 
     public Task<IRestResponse> ExecuteGetTaskAsync(IRestRequest request, CancellationToken token)
     {
-      return _innerClient.ExecuteGetTaskAsync(request, token);
+      return innerClient.ExecuteGetTaskAsync(request, token);
     }
 
     public Task<IRestResponse<T>> ExecuteGetTaskAsync<T>(IRestRequest request)
     {
-      return _innerClient.ExecuteGetTaskAsync<T>(request);
+      return innerClient.ExecuteGetTaskAsync<T>(request);
     }
 
     public Task<IRestResponse<T>> ExecuteGetTaskAsync<T>(IRestRequest request, CancellationToken token)
     {
-      return _innerClient.ExecuteGetTaskAsync<T>(request, token);
+      return innerClient.ExecuteGetTaskAsync<T>(request, token);
     }
 
     public Task<IRestResponse> ExecutePostTaskAsync(IRestRequest request)
     {
-      return _innerClient.ExecutePostTaskAsync(request);
+      return innerClient.ExecutePostTaskAsync(request);
     }
 
     public Task<IRestResponse> ExecutePostTaskAsync(IRestRequest request, CancellationToken token)
     {
-      return _innerClient.ExecutePostTaskAsync(request, token);
+      return innerClient.ExecutePostTaskAsync(request, token);
     }
 
     public Task<IRestResponse<T>> ExecutePostTaskAsync<T>(IRestRequest request)
     {
-      return _innerClient.ExecutePostTaskAsync<T>(request);
+      return innerClient.ExecutePostTaskAsync<T>(request);
     }
 
     public Task<IRestResponse<T>> ExecutePostTaskAsync<T>(IRestRequest request, CancellationToken token)
     {
-      return _innerClient.ExecutePostTaskAsync<T>(request, token);
+      return innerClient.ExecutePostTaskAsync<T>(request, token);
     }
 
     public Task<IRestResponse> ExecuteTaskAsync(IRestRequest request)
     {
-      return _innerClient.ExecuteTaskAsync(request);
+      return innerClient.ExecuteTaskAsync(request);
     }
 
     public Task<IRestResponse> ExecuteTaskAsync(IRestRequest request, CancellationToken token)
     {
-      return _innerClient.ExecuteTaskAsync(request, token);
+      return innerClient.ExecuteTaskAsync(request, token);
     }
 
     public Task<IRestResponse<T>> ExecuteTaskAsync<T>(IRestRequest request)
     {
-      return _innerClient.ExecuteTaskAsync<T>(request);
+      return innerClient.ExecuteTaskAsync<T>(request);
     }
 
     public Task<IRestResponse<T>> ExecuteTaskAsync<T>(IRestRequest request, CancellationToken token)
     {
-      return _innerClient.ExecuteTaskAsync<T>(request, token);
+      return innerClient.ExecuteTaskAsync<T>(request, token);
     }
 
     public void RemoveHandler(string contentType)
     {
-      _innerClient.RemoveHandler(contentType);
+      innerClient.RemoveHandler(contentType);
     }
 
 
     public IRestResponse<T> Deserialize<T>(IRestResponse response)
     {
-      return _innerClient.Deserialize<T>(response);
+      return innerClient.Deserialize<T>(response);
     }
 
     public IRestClient UseUrlEncoder(Func<string, string> encoder)
@@ -499,43 +517,43 @@ namespace RestSharpZipkin
 
     public IRestResponse Execute(IRestRequest request, Method httpMethod)
     {
-      return _innerClient.Execute(request, httpMethod);
+      return innerClient.Execute(request, httpMethod);
 
     }
 
     public IRestResponse<T> Execute<T>(IRestRequest request, Method httpMethod) where T : new()
     {
-      return _innerClient.Execute<T>(request, httpMethod);
+      return innerClient.Execute<T>(request, httpMethod);
     }
 
     public byte[] DownloadData(IRestRequest request, bool throwOnError)
     {
-      return _innerClient.DownloadData(request, throwOnError);
+      return innerClient.DownloadData(request, throwOnError);
     }
 
     public void ConfigureWebRequest(Action<HttpWebRequest> configurator)
     {
-      _innerClient.ConfigureWebRequest(configurator);
+      innerClient.ConfigureWebRequest(configurator);
     }
 
     public Task<IRestResponse<T>> ExecuteTaskAsync<T>(IRestRequest request, Method httpMethod)
     {
-      return _innerClient.ExecuteTaskAsync<T>(request, httpMethod);
+      return innerClient.ExecuteTaskAsync<T>(request, httpMethod);
     }
 
     public Task<IRestResponse> ExecuteTaskAsync(IRestRequest request, CancellationToken token, Method httpMethod)
     {
-      return _innerClient.ExecuteTaskAsync(request, token, httpMethod);
+      return innerClient.ExecuteTaskAsync(request, token, httpMethod);
     }
 
     public RestRequestAsyncHandle ExecuteAsync(IRestRequest request, Action<IRestResponse, RestRequestAsyncHandle> callback, Method httpMethod)
     {
-      return _innerClient.ExecuteAsync(request, callback, httpMethod);
+      return innerClient.ExecuteAsync(request, callback, httpMethod);
     }
 
     public RestRequestAsyncHandle ExecuteAsync<T>(IRestRequest request, Action<IRestResponse<T>, RestRequestAsyncHandle> callback, Method httpMethod)
     {
-      return _innerClient.ExecuteAsync<T>(request, callback, httpMethod);
+      return innerClient.ExecuteAsync<T>(request, callback, httpMethod);
     }
   }
 }
